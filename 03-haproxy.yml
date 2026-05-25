@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  haproxy:
+    image: haproxy:2.4
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "7000:7000"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks:
+      - retail_net
+    depends_on:
+      - pg-node-1
+      - pg-node-2
+      - pg-node-3
+
+networks:
+  retail_net:
+    external: true

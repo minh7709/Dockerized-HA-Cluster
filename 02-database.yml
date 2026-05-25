@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  pg-node-1:
+    build: .
+    environment: &patroni_env
+      PATRONI_NAME: "${HOSTNAME:-pg-node-1}"
+      PATRONI_SCOPE: "retail_cluster"
+      PATRONI_ETCD_HOST: "etcd:2379"
+      PATRONI_POSTGRESQL_LISTEN: "0.0.0.0:5432"
+      PATRONI_RESTAPI_LISTEN: "0.0.0.0:8008"
+      PATRONI_POSTGRESQL_DATA_DIR: "/var/lib/postgresql/data/patroni"
+      PATRONI_SUPERUSER_USERNAME: "postgres"
+      PATRONI_SUPERUSER_PASSWORD: "admin"
+      PATRONI_REPLICATION_USERNAME: "replicator"
+      PATRONI_REPLICATION_PASSWORD: "repl_password"
+    volumes:
+      - pg1-data:/var/lib/postgresql/data
+    networks:
+      - retail_net
+    depends_on:
+      - etcd
+
+  pg-node-2:
+    build: .
+    environment:
+      <<: *patroni_env
+      PATRONI_NAME: "pg-node-2"
+    volumes:
+      - pg2-data:/var/lib/postgresql/data
+    networks:
+      - retail_net
+    depends_on:
+      - etcd
+
+  pg-node-3:
+    build: .
+    environment:
+      <<: *patroni_env
+      PATRONI_NAME: "pg-node-3"
+    volumes:
+      - pg3-data:/var/lib/postgresql/data
+    networks:
+      - retail_net
+    depends_on:
+      - etcd
+
+networks:
+  retail_net:
+    external: true
+
+volumes:
+  pg1-data:
+  pg2-data:
+  pg3-data:
