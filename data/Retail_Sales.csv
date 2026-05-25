@@ -1,0 +1,11 @@
+date,customer_id,product_category,quantity,price
+2026-05-01,CUST-1001,Electronics,1,1200.00
+2026-05-01,CUST-1002,Clothing,3,45.50
+2026-05-02,CUST-1003,Home & Kitchen,2,150.00
+2026-05-02,CUST-1001,Electronics,1,299.99
+2026-05-03,CUST-1004,Books,5,12.25
+2026-05-03,CUST-1005,Beauty,1,85.00
+2026-05-04,CUST-1002,Clothing,2,60.00
+2026-05-04,CUST-1006,Sports,1,210.00
+2026-05-05,CUST-1003,Home & Kitchen,4,25.30
+2026-05-05,CUST-1007,Electronics,1,550.00
