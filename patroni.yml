@@ -12,5 +12,6 @@ postgresql:
   bin_dir: /usr/lib/postgresql/14/bin
 
   pg_hba:
+    - local all all trust
     - host replication replicator 0.0.0.0/0 md5
     - host all all 0.0.0.0/0 md5
