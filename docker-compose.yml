@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # ---------------- TẦNG HẠ TẦNG (ETCD) ----------------
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.0
+    environment:
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+      - ETCD_ENABLE_V2=true
+    networks:
+      - retail_net
+
+  # ---------------- TẦNG LƯU TRỮ (POSTGRES + PATRONI) ----------------
+  pg-node-1:
+    build: .
+    environment: &patroni_env
+      PATRONI_NAME: "pg-node-1"
+      PATRONI_RESTAPI_CONNECT_ADDRESS: "pg-node-1:8008"
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: "pg-node-1:5432"
+      PATRONI_SCOPE: "retail_cluster"
+      PATRONI_ETCD_HOST: "etcd:2379"
+      PATRONI_POSTGRESQL_LISTEN: "0.0.0.0:5432"
+      PATRONI_RESTAPI_LISTEN: "0.0.0.0:8008"
+      PATRONI_POSTGRESQL_DATA_DIR: "/var/lib/postgresql/data/patroni"
+      PATRONI_SUPERUSER_USERNAME: "postgres"
+      PATRONI_SUPERUSER_PASSWORD: "admin"
+      PATRONI_REPLICATION_USERNAME: "replicator"
+      PATRONI_REPLICATION_PASSWORD: "repl_password"
+    volumes:
+      - pg1-data:/var/lib/postgresql/data
+      - ./patroni.yml:/etc/patroni/patroni.yml:ro
+    networks:
+      - retail_net
+    depends_on:
+      - etcd
+
+  pg-node-2:
+    build: .
+    environment:
+      <<: *patroni_env
+      # Cấu hình định danh riêng cho Node 2
+      PATRONI_NAME: "pg-node-2"
+      PATRONI_RESTAPI_CONNECT_ADDRESS: "pg-node-2:8008"
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: "pg-node-2:5432"
+    volumes:
+      - pg2-data:/var/lib/postgresql/data
+      - ./patroni.yml:/etc/patroni/patroni.yml:ro
+    networks:
+      - retail_net
+    depends_on:
+      - etcd
+
+  pg-node-3:
+    build: .
+    environment:
+      <<: *patroni_env
+      # Cấu hình định danh riêng cho Node 3
+      PATRONI_NAME: "pg-node-3"
+      PATRONI_RESTAPI_CONNECT_ADDRESS: "pg-node-3:8008"
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: "pg-node-3:5432"
+    volumes:
+      - pg3-data:/var/lib/postgresql/data
+      - ./patroni.yml:/etc/patroni/patroni.yml:ro
+    networks:
+      - retail_net
+    depends_on:
+      - etcd
+
+  # ---------------- TẦNG ĐỊNH TUYẾN ----------------
+  haproxy:
+    image: haproxy:2.4
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "7000:7000"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks:
+      - retail_net
+    depends_on:
+      - pg-node-1
+      - pg-node-2
+      - pg-node-3
+
+networks:
+  retail_net:
+    driver: bridge
+
+volumes:
+  pg1-data:
+  pg2-data:
+  pg3-data:

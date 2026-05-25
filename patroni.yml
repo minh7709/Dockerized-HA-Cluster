@@ -1,0 +1,16 @@
+bootstrap:
+  dcs:
+    postgresql:
+      use_pg_rewind: true
+  initdb:
+    - auth-host: md5
+    - auth-local: trust
+    - encoding: UTF8
+    - data-checksums
+
+postgresql:
+  bin_dir: /usr/lib/postgresql/14/bin
+
+  pg_hba:
+    - host replication replicator 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
