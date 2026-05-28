@@ -1,4 +1,4 @@
-# Stage 1: Data Preparation
+# Stage 1: Chuan bi Data
 FROM alpine:latest AS data-prep
 WORKDIR /prep
 COPY data/Retail_Sales.csv .
@@ -20,5 +20,4 @@ RUN chmod +x /usr/bin/patroni
 RUN chown postgres:postgres /tmp/Retail_Sales.csv /tmp/init.sql
 
 USER postgres
-# -----------------
 ENTRYPOINT ["/usr/bin/patroni", "/etc/patroni/patroni.yml"]
