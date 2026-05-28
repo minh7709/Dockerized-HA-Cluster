@@ -27,7 +27,12 @@ Hệ thống được thiết kế theo mô hình Cloud-Native tiêu chuẩn bao
 ---
 
 ## 🛠️ Hướng dẫn Cài đặt & Khởi động cụm (Setup)
-
+### 🛠️ 0. Set up môi trường
+```bash
+# Đối với Windows CMD
+git clone https://github.com/minh7709/Dockerized-HA-Cluster.git
+cd Dockerized-HA-Cluster
+```
 ### 📥 1. Khởi động Cụm với Docker Compose
 Mở Terminal tại thư mục gốc của dự án và khởi chạy lệnh sau để build Image và kích hoạt tất cả các container:
 ```bash
@@ -69,7 +74,7 @@ Chạy file SQL `init.sql` bên trong container Primary (ví dụ là `dockerize
 # Đối với Windows Git Bash / MSYS:
 MSYS_NO_PATHCONV=1 docker exec -it dockerized-ha-cluster-pg-node-2-1 psql -U postgres -d postgres -f /tmp/init.sql
 
-# Lệnh tiêu chuẩn:
+# Lệnh tiêu chuẩn trên windows cmd:
 docker exec -it dockerized-ha-cluster-pg-node-2-1 psql -U postgres -d postgres -f //tmp/init.sql
 ```
 
@@ -106,7 +111,7 @@ docker exec -it dockerized-ha-cluster-pg-node-3-1 psql -U postgres -d postgres -
 Quy trình tự động hóa bầu cử Primary mới và định tuyến lại kết nối khi có sự cố được kiểm thử như sau:
 
 ### 🏃♂️ Bước 1: Chạy script kiểm thử chèn dữ liệu liên tục
-Mở một cửa sổ Terminal mới và chạy script Python. Script này sẽ tự động tìm kiếm primary node và kill node đó, ngay lập tức nó sẽ liên tục write các dữ liệu giả lập vào cổng HAProxy `5000` mỗi `0.05` giây:
+Mở một cửa sổ Terminal mới ở thư mục gốc và chạy script Python. Script này sẽ tự động tìm kiếm primary node và kill node đó, ngay lập tức nó sẽ liên tục write các dữ liệu giả lập vào cổng HAProxy `5000` mỗi `0.05` giây:
 ```bash
 python test_failover.py
 ```
