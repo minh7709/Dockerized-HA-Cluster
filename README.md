@@ -105,41 +105,28 @@ docker exec -it dockerized-ha-cluster-pg-node-3-1 psql -U postgres -d postgres -
 
 Quy trình tự động hóa bầu cử Primary mới và định tuyến lại kết nối khi có sự cố được kiểm thử như sau:
 
-### 🏃‍♂️ Bước 1: Chạy script kiểm thử chèn dữ liệu liên tục
-Mở một cửa sổ Terminal mới và chạy script Python. Script này sẽ liên tục chèn các đơn hàng giả lập vào cổng HAProxy `5000` mỗi `0.5` giây:
+### 🏃♂️ Bước 1: Chạy script kiểm thử chèn dữ liệu liên tục
+Mở một cửa sổ Terminal mới và chạy script Python. Script này sẽ tự động tìm kiếm primary node và kill node đó, ngay lập tức nó sẽ liên tục write các dữ liệu giả lập vào cổng HAProxy `5000` mỗi `0.05` giây:
 ```bash
 python test_failover.py
 ```
-
-### 💥 Bước 2: Giả lập Container Primary bị Crash đột ngột
-Trong khi script Python đang chạy, hãy mở một Terminal khác và thực hiện "Kill" đột ngột Primary node ( ví dụ : `pg-node-2`):
-```bash
-docker kill dockerized-ha-cluster-pg-node-2-1
-```
-
-### 📈 Bước 3: Xem kết quả Failover
+### 📈 Bước 2: Xem kết quả Failover
 *   Script Python sẽ ghi nhận kết nối Write bị gián đoạn và bắt đầu đếm thời gian downtime bằng các dấu chấm `....`.
-*   **Patroni** và **etcd** sẽ lập tức phát hiện Leader bị mất kết nối và tự động bầu chọn một Standby Node khác làm Primary mới.
+*  **HAProxy**, **Patroni** và **etcd** sẽ lập tức phát hiện Leader bị mất kết nối và tự động bầu chọn một Standby Node khác làm Primary mới.
 *   **HAProxy** tự động cập nhật sức khỏe các node và định tuyến luồng Ghi sang Primary mới.
 *   Script Python tự động kết nối lại thành công và in ra tổng thời gian Downtime thực tế (tính bằng giây).
 
 ```bash
 --- BẮT ĐẦU TEST FAILOVER ---
-04:54:11 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:12 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:12 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:13 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:13 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:14 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:14 - WRITE OK: Đã thêm 1 đơn hàng giả.
-04:54:15 - WRITE OK: Đã thêm 1 đơn hàng giả.
+ => 05:41:49 - WRITE OK: Đã ghi thành công.
+ => [OK] Container 'cf968638de1a' đã bị kill thành công.
+Đang kiểm tra kết nối ghi liên tục mỗi 0.05 giây...
+..............................................................................................................................................................................................................................................................................
 
-[error] Mất kết nối Write! Bắt đầu đếm thời gian downtime...
-....
-[RECOVER] Ghi dữ liệu thành công! Node Primary đã được bầu.
-=====================================
-FAILOVER TIME: 34.90969204902649 GIÂY
-=====================================
+[RECOVER] Ghi dữ liệu thành công! Node Primary mới đã được bầu.
+====================================================
+FAILOVER TIME (DOWNTIME): 30.8530 GIÂY
+====================================================
 ```
 ---
 ### 📤 Kết quả:
