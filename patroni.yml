@@ -7,6 +7,7 @@ bootstrap:
     - auth-local: trust
     - encoding: UTF8
     - data-checksums
+  post_init: /tmp/post_init.sh
 
 postgresql:
   bin_dir: /usr/lib/postgresql/14/bin
