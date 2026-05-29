@@ -1,5 +1,6 @@
 # 🚀 Topic 121. Dockerized PostgreSQL HA Cluster: "High Availability Retail" 🛒
-
+Hoàng Quang Minh - N23DCCN106
+---
 Chào mừng bạn đến với dự án **High Availability PostgreSQL Cluster** chuyên dụng cho hệ thống Bán lẻ! Dự án này triển khai một hạ tầng cơ sở dữ liệu có độ tin cậy và sẵn sàng cao (High Availability) sử dụng **Patroni**, **etcd**, và **HAProxy** được đóng gói hoàn chỉnh bằng **Docker Compose**.
 
 ---
