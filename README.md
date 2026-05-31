@@ -34,7 +34,7 @@ Hệ thống được thiết kế theo mô hình Cloud-Native tiêu chuẩn bao
 git clone https://github.com/minh7709/Dockerized-HA-Cluster.git
 cd Dockerized-HA-Cluster
 ```
-### 📥 1. Khởi động Cụm với Docker Compose
+### 📥 1. Khởi động Cụm với Docker Compose (dữ liệu được tạo tự động)
 Mở Terminal tại thư mục gốc của dự án và khởi chạy lệnh sau để build Image và kích hoạt tất cả các container:
 ```bash
 docker-compose up -d --build
@@ -65,27 +65,7 @@ Bạn có thể xem trực quan trạng thái định tuyến của các Node th
 
 ---
 
-## 🗄️ Khởi tạo Cơ sở Dữ liệu & Nạp dữ liệu CSV (Database Init)
-
-Sau khi cụm container khởi động thành công, tiến hành tạo bảng và import dữ liệu từ file CSV mẫu vào hệ thống bằng các bước sau:
-
-### 📐 Bước 1: Tạo cấu trúc bảng `retail_sales`
-Chạy file SQL `init.sql` bên trong container Primary (ví dụ là `dockerized-ha-cluster-pg-node-2-1`) để tạo bảng (hỗ trợ bỏ qua cảnh báo đường dẫn trên môi trường Windows Git Bash / MSYS):
-```bash
-# Đối với Windows Git Bash / MSYS:
-MSYS_NO_PATHCONV=1 docker exec -it dockerized-ha-cluster-pg-node-2-1 psql -U postgres -d postgres -f /tmp/init.sql
-
-# Lệnh tiêu chuẩn trên windows cmd:
-docker exec -it dockerized-ha-cluster-pg-node-2-1 psql -U postgres -d postgres -f //tmp/init.sql
-```
-
-### 📥 Bước 2: Import dữ liệu từ file CSV
-Nạp dữ liệu từ file `Retail_Sales.csv` mẫu vào bảng vừa tạo trong container Primary:
-```bash
-docker exec -it dockerized-ha-cluster-pg-node-2-1 psql -U postgres -d postgres -c "\copy retail_sales (date, customer_id, product_category, quantity, price) FROM '/tmp/Retail_Sales.csv' WITH (FORMAT CSV, HEADER);"
-```
-
-### 👁️ Bước 3: Kiểm tra lại dữ liệu đã nạp
+### 👁️ Bước 2: Kiểm tra lại dữ liệu đã nạp
 Truy vấn trực tiếp để kiểm tra dữ liệu đã được import thành công vào cơ sở dữ liệu trong container Primary và standby:
 ```bash
 docker exec -it dockerized-ha-cluster-pg-node-3-1 psql -U postgres -d postgres -c "SELECT * FROM retail_sales;"
