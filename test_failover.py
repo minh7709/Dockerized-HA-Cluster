@@ -18,8 +18,8 @@ def get_primary_container_id():
     try:
         conn = psycopg.connect(**DB_CONFIG)
         cur = conn.cursor()
-        cur.execute("SELECT pg_read_file('/etc/hostname');")
-        container_id = cur.fetchone()[0].strip()
+        cur.execute("SELECT pg_read_file('/etc/hostname');") # Đọc file hostname của Linux chứa PostgreSQL
+        container_id = cur.fetchone()[0].strip() # Trong Docker, file hostname chứa trực tiếp Container ID. Dòng này lấy ra ID đó và loại bỏ khoảng trắng.
         cur.close()
         conn.close()
         return container_id
@@ -62,7 +62,7 @@ def test_failover():
             ["docker", "kill", target_container],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            text=True, #Lệnh này ép Python tự động dịch các byte đó sang dạng chuỗi văn bản (String)
             check=True
         )
         start_downtime = time.time()

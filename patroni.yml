@@ -2,17 +2,21 @@ bootstrap:
   dcs:
     postgresql:
       use_pg_rewind: true
+      #  Khi cái Node chết lúc nãy tỉnh lại, nó bị phát hiện là mang bộ dữ liệu "Lệch pha".
+      #  Nếu không bật tính năng pg_rewind, Patroni sẽ buộc Node đó phải làm lại toàn bộ quá trình khởi tạo dữ liệu từ đầu (Reinitialize).
+      # khi bật pg_rewind, Patroni sẽ chỉ cần đồng bộ lại những phần dữ liệu bị lệch pha đó, và node làm standby
   initdb:
-    - auth-host: md5
+    - auth-host: md5 # thông qua địa chỉ IP (mạng), đều phải giao mật khẩu được băm qua chuẩn mã hoá md5.
     - auth-local: trust
     - encoding: UTF8
     - data-checksums
   post_init: /tmp/post_init.sh
 
 postgresql:
-  bin_dir: /usr/lib/postgresql/14/bin
+  bin_dir: /usr/lib/postgresql/14/bin # Đường dẫn đến thư mục chứa các file thực thi của PostgreSQL
 
   pg_hba:
+  # Cấu hình tường lửa pg_hba.conf để cho phép Replica kết nối đồng bộ
     - local all all trust
-    - host replication replicator 0.0.0.0/0 md5
+    - host replication replicator 0.0.0.0/0 md5 # phục vụ riêng cho quyền lực "Replication" (Sao chép đồng bộ của Replicas)
     - host all all 0.0.0.0/0 md5

@@ -12,7 +12,7 @@ services:
 
   pg-node-1:
     build: .
-    environment: &patroni_env
+    environment: &patroni_env # "Anchor". Nó lấy toàn bộ phần khối bên dưới đóng gói thành một cái nhãn tên là patroni_env để cấu hình 2 và 3 dùng lại
       PATRONI_NAME: "pg-node-1"
       PATRONI_RESTAPI_CONNECT_ADDRESS: "pg-node-1:8008"
       PATRONI_POSTGRESQL_CONNECT_ADDRESS: "pg-node-1:5432"
